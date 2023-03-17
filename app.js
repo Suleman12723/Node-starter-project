@@ -17,7 +17,7 @@ const development = process.env.NODE_ENV==='development';
 
 //import routes
 import authRouter from './routes/auth.routes.js';
-import userRouter from './routes/user.routes.js';
+// import userRouter from './routes/user.routes.js';
 
 
 
@@ -65,7 +65,7 @@ app.use(corsAll);
 
 // routes
 app.use('/auth',authRouter);
-app.use('/user',userRouter);
+// app.use('/user',userRouter);
 
 
 

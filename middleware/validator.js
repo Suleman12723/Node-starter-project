@@ -89,5 +89,6 @@ const validate = (req,res,next)=>{
 export {
     signupValidators,
     loginValidators,
+    refreshTokenValidators,
     validate,
 }

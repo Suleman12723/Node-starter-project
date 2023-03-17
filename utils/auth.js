@@ -4,11 +4,11 @@ import JwtStrategyPassport from "passport-jwt";
 const JwtStrategy = JwtStrategyPassport.Strategy;
 import ExtractJwtPassport from "passport-jwt";
 const ExtractJwt = ExtractJwtPassport.ExtractJwt;
-import GoogleStrategyPassport from "passport-google-oauth2" 
-const GoogleStrategy = GoogleStrategyPassport.Strategy;
 import bcrypt from "bcryptjs";
 import USER from "../models/user.js";
 import UnAuthorized from "../errors/unAuthorized.js";
+import dotenv from 'dotenv';
+dotenv.config();
 
 
 
@@ -25,55 +25,6 @@ const hashPassword = async (saltRounds, password) => {
   return hashed;
 };
 
-//google Strategy
-const google = passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.GOOGLE_CALLBACK_URL,
-      passReqToCallback: true,
-    },
-    async (request, accessToken, refreshToken, profile, done) => {
-      try {
-        let foundUser = await USER.findOne({googleId:profile.id});
-        if (!foundUser) {
-          let createdUser = await USER.create(
-            new USER({
-              googleId: profile.id,
-              name: profile.displayName,
-              email: profile.email,
-              avatar: profile.picture,
-              emailVerified:profile.email_verified,
-              authType: "Google",
-            })
-          );
-          if(!createdUser){
-            let err = new Error("Something went Wrong");
-            return done(err,false);
-          }
-          return done(null,createdUser)
-        }
-        return done(null,foundUser);
-      } catch (err) {
-        return done(err,false)
-      }
-    }
-  )
-);
-
-// Serialize and deserialize user
-passport.serializeUser((user, cb) => {
-  cb(null, user._id);
-});
-passport.deserializeUser((id, cb) => {
-  USER.findById(id, (err, user) => {
-    if (err) {
-      return cb(err);
-    }
-    cb(null, user);
-  });
-});
 
 // Token generator functions
 const accessTokenGenerator = (user) => {
@@ -148,10 +99,8 @@ export default {
     verifyRefreshToken,
     verifyUser,
     hashPassword,
-    google,
     refreshTokenGenerator,
     accessTokenGenerator,
-    jwtPassport
 
 
 } 
